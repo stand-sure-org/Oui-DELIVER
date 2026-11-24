@@ -47,7 +47,7 @@ jobs:
         id: changes
         # NOTE: @main ref means changes to detect-changes won't take effect
         # until merged — test action changes via workflow_dispatch first
-        uses: stand-sure-org/Oui-DELIVER/.github/actions/detect-changes@feat/dotnet11-standalone
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/detect-changes@main
 
   sast:
     runs-on: ubuntu-latest
@@ -255,7 +255,7 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Check licenses
-        uses: stand-sure-org/Oui-DELIVER/.github/actions/check-licenses-action@feat/dotnet11-standalone
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/check-licenses-action@main
         with:
           allowed_licenses_path: "${{ inputs.allowed_licenses_path }}"
           ignored_packages_path: "${{ inputs.ignored_packages_path }}"
@@ -270,6 +270,6 @@ jobs:
     needs: [detect]
     if: needs.detect.outputs.docs_only != 'true'
     name: Check Warnings as Errors
-    uses: stand-sure-org/Oui-DELIVER/.github/workflows/enforce-treat-warnings-as-errors.yaml@feat/dotnet11-standalone
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/enforce-treat-warnings-as-errors.yaml@main
     with:
       bypass_until: ${{ vars.ENFORCE_WARNINGS_BYPASS_UNTIL }}
