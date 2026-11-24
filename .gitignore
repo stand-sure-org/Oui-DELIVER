@@ -11,3 +11,5 @@ research/github-security-rotation/
 coordinator-control.sh
 COORDINATOR.md
 QUICKREF-COORDINATOR.md
+.DS_Store
+.dex/

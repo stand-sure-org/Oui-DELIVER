@@ -18,10 +18,10 @@ on: [push, pull_request]
 
 jobs:
   build:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/build-publish.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/build-publish.yml@main
     with:
       imageName: my-service
-      argoCdRepoName: innago-property-management/argocd-apps
+      argoCdRepoName: stand-sure-org/argocd-apps
       minimumCoverage: 80
     secrets:
       githubToken: ${{ secrets.GITHUB_TOKEN }}
@@ -34,10 +34,10 @@ jobs:
 ```yaml
 jobs:
   build:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/build-publish-node.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/build-publish-node.yml@main
     with:
       imageName: my-node-service
-      argoCdRepoName: innago-property-management/argocd-apps
+      argoCdRepoName: stand-sure-org/argocd-apps
     secrets:
       githubToken: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -157,7 +157,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/build-publish.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/build-publish.yml@main
     secrets: inherit
 ```
 
@@ -169,12 +169,12 @@ on: [push, pull_request]
 
 jobs:
   security-checks:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/merge-checks.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/merge-checks.yml@main
     secrets: inherit
 
   build-and-deploy:
     needs: security-checks
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/build-publish.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/build-publish.yml@main
     with:
       imageName: my-service
       argoCdRepoName: my-org/argocd-apps
@@ -187,7 +187,7 @@ jobs:
 
   risk-assessment:
     if: github.event_name == 'pull_request'
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/deployment-risk-assessment.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/deployment-risk-assessment.yml@main
     with:
       pr_number: ${{ github.event.pull_request.number }}
       base_branch: ${{ github.event.pull_request.base.ref }}
