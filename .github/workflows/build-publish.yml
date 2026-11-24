@@ -195,6 +195,8 @@ jobs:
       id-token: write
       attestations: write
       pull-requests: write
+      # dorny/test-reporter publishes the test results as a check run
+      checks: write
     needs: [version, detect]
     timeout-minutes: 30
     steps:
