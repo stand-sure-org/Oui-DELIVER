@@ -52,6 +52,26 @@ on:
         description: "GitHub Actions runner label. Use a larger runner label to avoid OOM on large builds."
         type: string
         default: 'ubuntu-latest'
+      nugetFeedOrganization:
+        required: false
+        description: "GitHub organization whose GitHub Packages NuGet feed is added before restore. Empty means use the repo's own NuGet config only."
+        type: string
+        default: ''
+      nugetPushOrganization:
+        required: false
+        description: "GitHub organization whose GitHub Packages feed receives NuGet packages on main and tags. Defaults to the repository owner."
+        type: string
+        default: ''
+      nugetPackagesPath:
+        required: false
+        description: "Directory holding the built .nupkg files. Empty keeps the bin/Release search."
+        type: string
+        default: ''
+      testArguments:
+        required: false
+        description: "Extra dotnet test arguments when global.json selects Microsoft.Testing.Platform."
+        type: string
+        default: ''
 
   workflow_call:
     inputs:
@@ -105,17 +125,37 @@ on:
         description: "GitHub Actions runner label. Use a larger runner label to avoid OOM on large builds."
         type: string
         default: 'ubuntu-latest'
+      nugetFeedOrganization:
+        required: false
+        description: "GitHub organization whose GitHub Packages NuGet feed is added before restore. Empty means use the repo's own NuGet config only."
+        type: string
+        default: ''
+      nugetPushOrganization:
+        required: false
+        description: "GitHub organization whose GitHub Packages feed receives NuGet packages on main and tags. Defaults to the repository owner."
+        type: string
+        default: ''
+      nugetPackagesPath:
+        required: false
+        description: "Directory holding the built .nupkg files. Empty keeps the bin/Release search."
+        type: string
+        default: ''
+      testArguments:
+        required: false
+        description: "Extra dotnet test arguments when global.json selects Microsoft.Testing.Platform."
+        type: string
+        default: ''
 
     secrets:
       githubToken:
         description: "Github token"
         required: true
       cosignKey:
-        description: "Cosign key"
-        required: true
+        description: "Cosign key (only used when imageName is set)"
+        required: false
       cosignPassword:
-        description: "Cosign password"
-        required: true
+        description: "Cosign password (only used when imageName is set)"
+        required: false
 
 concurrency:
   group: build-publish-${{ github.ref }}
@@ -127,7 +167,7 @@ permissions:
 
 jobs:
   version:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/semver.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/semver.yml@feat/dotnet11-standalone
     permissions:
       contents: read
 
@@ -145,7 +185,7 @@ jobs:
     steps:
       - name: Detect build type
         id: detect
-        uses: innago-property-management/Oui-DELIVER/.github/actions/detect-build-type@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/detect-build-type@feat/dotnet11-standalone
 
   build:
     runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
@@ -163,12 +203,14 @@ jobs:
       - name: Build and Test
         # Skip on release for Docker-only repos (tests already passed in PR)
         if: needs.detect.outputs.skip_tests != 'true'
-        uses: innago-property-management/Oui-DELIVER/.github/actions/build-dotnet@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/build-dotnet@feat/dotnet11-standalone
         with:
           version: ${{ needs.version.outputs.version }}
           githubToken: "${{ secrets.GITHUB_TOKEN }}"
           minimumCoverage: "${{ inputs.minimumCoverage }}"
           testProjectPath: "${{ inputs.testProjectPath }}"
+          organization: "${{ inputs.nugetFeedOrganization }}"
+          testArguments: "${{ inputs.testArguments }}"
 
       - name: Build only (no tests - Docker-only release)
         # Skip tests on release for Docker-only repos:
@@ -182,23 +224,28 @@ jobs:
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NuGetPackageSourceCredentials_github: "Username=${{ github.actor }};Password=${{ secrets.GITHUB_TOKEN }}"
+          NUGET_FEED_ORG: ${{ inputs.nugetFeedOrganization }}
         run: |
           echo "::notice::Skipping tests (Docker-only on release, tests passed in PR)"
-          dotnet nuget add source \
-            --name "github" \
-            "https://nuget.pkg.github.com/innago-property-management/index.json" || true
+          if [[ -n "${NUGET_FEED_ORG}" ]]; then
+            dotnet nuget add source \
+              --name "github" \
+              "https://nuget.pkg.github.com/${NUGET_FEED_ORG}/index.json" || true
+          fi
           dotnet restore
           dotnet build --configuration Release --no-restore
 
       - name: Push Nuget packages
         if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) && needs.detect.outputs.has_nuget == 'true'
-        uses: innago-property-management/Oui-DELIVER/.github/actions/push-nuget-packages@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/push-nuget-packages@feat/dotnet11-standalone
         with:
           pushToken: "${{ secrets.githubToken }}"
+          organization: "${{ inputs.nugetPushOrganization || github.repository_owner }}"
+          searchPath: "${{ inputs.nugetPackagesPath }}"
 
       - name: Generate SBOM
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
-        uses: innago-property-management/Oui-DELIVER/.github/actions/generate-sbom-dotnet@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/generate-sbom-dotnet@feat/dotnet11-standalone
 
       - name: Upload SBOMs
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
@@ -210,7 +257,7 @@ jobs:
 
       - name: Publish Container Image
         if: inputs.imageName != ''
-        uses: innago-property-management/Oui-DELIVER/.github/actions/build-publish-sign-docker@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/build-publish-sign-docker@feat/dotnet11-standalone
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -226,7 +273,7 @@ jobs:
           cosignPassword: ${{ secrets.cosignPassword }}
           buildArgs: |
             NUGET_SOURCE_NAME=github
-            NUGET_SOURCE_URL=https://nuget.pkg.github.com/innago-property-management/index.json
+            NUGET_SOURCE_URL=https://nuget.pkg.github.com/${{ inputs.nugetFeedOrganization || github.repository_owner }}/index.json
             NUGET_USERNAME=${{ github.actor }}
           secrets: |
             nuget_password=${{ secrets.githubToken }}
@@ -236,7 +283,7 @@ jobs:
 
       - name: Update ArgoCD
         if: inputs.imageName != ''
-        uses: innago-property-management/Oui-DELIVER/.github/actions/update-argocd@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/update-argocd@feat/dotnet11-standalone
         with:
           githubToken: ${{ secrets.githubToken }}
           repoName: ${{ inputs.argoCdRepoName }}
@@ -262,7 +309,7 @@ jobs:
   generate_provenance:
     needs: build
     if: inputs.slsa && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/generate-provenance.yaml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/generate-provenance.yaml@feat/dotnet11-standalone
     permissions:
       attestations: write
       id-token: write

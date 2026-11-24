@@ -36,8 +36,24 @@ jobs:
           # Use process substitution to avoid subshell variable loss from pipe
           while IFS= read -r -d $'\0' project_file; do
             # Check for TreatWarningsAsErrors anywhere in the csproj
-            # (may be in a Release-conditioned PropertyGroup or global PropertyGroup)
-            if ! grep -q "<TreatWarningsAsErrors>true</TreatWarningsAsErrors>" "$project_file"; then
+            # (may be in a Release-conditioned PropertyGroup or global PropertyGroup),
+            # or in a Directory.Build.props that MSBuild imports for it (the
+            # project's own directory or any parent up to the repo root).
+            found=false
+            if grep -q "<TreatWarningsAsErrors>true</TreatWarningsAsErrors>" "$project_file"; then
+              found=true
+            else
+              dir=$(dirname "$project_file")
+              while :; do
+                if [ -f "$dir/Directory.Build.props" ] && grep -q "<TreatWarningsAsErrors>true</TreatWarningsAsErrors>" "$dir/Directory.Build.props"; then
+                  found=true
+                  break
+                fi
+                [ "$dir" = "." ] && break
+                dir=$(dirname "$dir")
+              done
+            fi
+            if [ "$found" != true ]; then
               violations="$violations"$'\n'"  - $project_file"
             fi
           done < <(find . -name "*.csproj" -not -path "*[Tt]est*" -not -path "*[Ee]xample*" -print0)

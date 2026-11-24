@@ -33,7 +33,7 @@ jobs:
       - name: Checkout Oui-DELIVER template as fallback
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          repository: innago-property-management/Oui-DELIVER
+          repository: stand-sure-org/Oui-DELIVER
           token: ${{ steps.app_token.outputs.token || secrets.token }}
           path: _oui_deliver
           sparse-checkout: .github/pull_request_template.md
