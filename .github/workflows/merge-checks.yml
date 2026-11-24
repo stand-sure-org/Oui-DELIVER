@@ -12,6 +12,11 @@ on:
         required: true
         description: "Path to the ignored packages JSON file"
         type: string
+      nugetFeedOrganization:
+        required: false
+        description: "GitHub organization whose GitHub Packages NuGet feed is added before restore. Empty means use the repo's own NuGet config only."
+        type: string
+        default: ''
     secrets:
       githubToken:
         description: "Github token"
@@ -42,7 +47,7 @@ jobs:
         id: changes
         # NOTE: @main ref means changes to detect-changes won't take effect
         # until merged — test action changes via workflow_dispatch first
-        uses: innago-property-management/Oui-DELIVER/.github/actions/detect-changes@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/detect-changes@feat/dotnet11-standalone
 
   sast:
     runs-on: ubuntu-latest
@@ -80,7 +85,14 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup .NET (global.json)
+        if: hashFiles('global.json') != ''
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
+        with:
+          global-json-file: global.json
+          dotnet-version: "10.x"
       - name: Setup .NET
+        if: hashFiles('global.json') == ''
         uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
         with:
           dotnet-version: |
@@ -101,12 +113,15 @@ jobs:
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.githubToken }}
           NuGetPackageSourceCredentials_github: "Username=${{ github.actor }};Password=${{ secrets.githubToken }}"
+          NUGET_FEED_ORG: ${{ inputs.nugetFeedOrganization }}
         run: |
           export PATH="$HOME/.local/bin:$PATH"
 
-          dotnet nuget add source \
-            --name "github" \
-            "https://nuget.pkg.github.com/innago-property-management/index.json"
+          if [[ -n "${NUGET_FEED_ORG}" ]]; then
+            dotnet nuget add source \
+              --name "github" \
+              "https://nuget.pkg.github.com/${NUGET_FEED_ORG}/index.json"
+          fi
 
           dotnet restore
 
@@ -160,10 +175,19 @@ jobs:
     timeout-minutes: 3
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Setup .NET
+      - name: Setup .NET (global.json)
+        if: hashFiles('global.json') != ''
         uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
         with:
-          dotnet-version: "9.x"
+          global-json-file: global.json
+          dotnet-version: "10.x"
+      - name: Setup .NET
+        if: hashFiles('global.json') == ''
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
+        with:
+          dotnet-version: |
+            9.x
+            10.x
       - name: Cache NuGet packages
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
@@ -178,12 +202,15 @@ jobs:
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.githubToken }}
           NuGetPackageSourceCredentials_github: "Username=${{ github.actor }};Password=${{ secrets.githubToken }}"
+          NUGET_FEED_ORG: ${{ inputs.nugetFeedOrganization }}
         shell: bash
         run: |
           set -euo pipefail
-          dotnet nuget add source \
-            --name "github" \
-            "https://nuget.pkg.github.com/innago-property-management/index.json"
+          if [[ -n "${NUGET_FEED_ORG}" ]]; then
+            dotnet nuget add source \
+              --name "github" \
+              "https://nuget.pkg.github.com/${NUGET_FEED_ORG}/index.json"
+          fi
 
           PATH=/root/.dotnet/tools:$PATH
           dotnet tool install --global dotnet-outdated-tool
@@ -196,7 +223,8 @@ jobs:
             solution=$(find . -type f -name '*.sln')
           fi
 
-          dotnet outdated "${solution}" \
+          # Global tools may target an older runtime than the repo's SDK
+          DOTNET_ROLL_FORWARD=Major dotnet outdated "${solution}" \
             --output outdated.json \
             --fail-on-updates \
             --version-lock Major
@@ -227,11 +255,12 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Check licenses
-        uses: innago-property-management/Oui-DELIVER/.github/actions/check-licenses-action@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/check-licenses-action@feat/dotnet11-standalone
         with:
           allowed_licenses_path: "${{ inputs.allowed_licenses_path }}"
           ignored_packages_path: "${{ inputs.ignored_packages_path }}"
           githubToken: "${{ secrets.githubToken }}"
+          nugetFeedOrganization: "${{ inputs.nugetFeedOrganization }}"
       - name: Upload licenses
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -241,6 +270,6 @@ jobs:
     needs: [detect]
     if: needs.detect.outputs.docs_only != 'true'
     name: Check Warnings as Errors
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/enforce-treat-warnings-as-errors.yaml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/enforce-treat-warnings-as-errors.yaml@feat/dotnet11-standalone
     with:
       bypass_until: ${{ vars.ENFORCE_WARNINGS_BYPASS_UNTIL }}

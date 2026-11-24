@@ -10,11 +10,22 @@ inputs:
   githubToken:
     required: true
     description: "Github Token"
+  nugetFeedOrganization:
+    required: false
+    description: "GitHub organization whose GitHub Packages NuGet feed is added before restore. Empty means use the repo's own NuGet config only."
+    default: ''
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+    - name: Setup .NET (global.json)
+      if: hashFiles('global.json') != ''
+      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
+      with:
+        global-json-file: global.json
+        dotnet-version: "10.x"
     - name: Setup .NET
+      if: hashFiles('global.json') == ''
       uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
       with:
         dotnet-version: |
@@ -30,10 +41,13 @@ runs:
         NuGetPackageSourceCredentials_github: "Username=${{ github.actor }};Password=${{ inputs.githubToken }}"
         ALLOWED_LICENSES_PATH: ${{ inputs.allowed_licenses_path }}
         IGNORED_PACKAGES_PATH: ${{ inputs.ignored_packages_path }}
+        NUGET_FEED_ORG: ${{ inputs.nugetFeedOrganization }}
       run: |
-        dotnet nuget add source \
-          --name "github" \
-          "https://nuget.pkg.github.com/innago-property-management/index.json"
+        if [[ -n "${NUGET_FEED_ORG}" ]]; then
+          dotnet nuget add source \
+            --name "github" \
+            "https://nuget.pkg.github.com/${NUGET_FEED_ORG}/index.json"
+        fi
         
         dotnet restore
         dotnet tool install --global nuget-license || continue
@@ -47,7 +61,8 @@ runs:
         
         mkdir out
         output_path="out/licenses.json"
-        nuget-license \
+        # Global tools may target an older runtime than the repo's SDK
+        DOTNET_ROLL_FORWARD=Major nuget-license \
          --input "$solution" \
          --include-shared-projects \
          --output jsonpretty \
