@@ -167,7 +167,7 @@ permissions:
 
 jobs:
   version:
-    uses: stand-sure-org/Oui-DELIVER/.github/workflows/semver.yml@feat/dotnet11-standalone
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/semver.yml@main
     permissions:
       contents: read
 
@@ -185,7 +185,7 @@ jobs:
     steps:
       - name: Detect build type
         id: detect
-        uses: stand-sure-org/Oui-DELIVER/.github/actions/detect-build-type@feat/dotnet11-standalone
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/detect-build-type@main
 
   build:
     runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
@@ -205,7 +205,7 @@ jobs:
       - name: Build and Test
         # Skip on release for Docker-only repos (tests already passed in PR)
         if: needs.detect.outputs.skip_tests != 'true'
-        uses: stand-sure-org/Oui-DELIVER/.github/actions/build-dotnet@feat/dotnet11-standalone
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/build-dotnet@main
         with:
           version: ${{ needs.version.outputs.version }}
           githubToken: "${{ secrets.GITHUB_TOKEN }}"
@@ -239,7 +239,7 @@ jobs:
 
       - name: Push Nuget packages
         if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) && needs.detect.outputs.has_nuget == 'true'
-        uses: stand-sure-org/Oui-DELIVER/.github/actions/push-nuget-packages@feat/dotnet11-standalone
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/push-nuget-packages@main
         with:
           pushToken: "${{ secrets.githubToken }}"
           organization: "${{ inputs.nugetPushOrganization || github.repository_owner }}"
@@ -247,7 +247,7 @@ jobs:
 
       - name: Generate SBOM
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
-        uses: stand-sure-org/Oui-DELIVER/.github/actions/generate-sbom-dotnet@feat/dotnet11-standalone
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/generate-sbom-dotnet@main
 
       - name: Upload SBOMs
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
@@ -259,7 +259,7 @@ jobs:
 
       - name: Publish Container Image
         if: inputs.imageName != ''
-        uses: stand-sure-org/Oui-DELIVER/.github/actions/build-publish-sign-docker@feat/dotnet11-standalone
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/build-publish-sign-docker@main
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -285,7 +285,7 @@ jobs:
 
       - name: Update ArgoCD
         if: inputs.imageName != ''
-        uses: stand-sure-org/Oui-DELIVER/.github/actions/update-argocd@feat/dotnet11-standalone
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/update-argocd@main
         with:
           githubToken: ${{ secrets.githubToken }}
           repoName: ${{ inputs.argoCdRepoName }}
@@ -311,7 +311,7 @@ jobs:
   generate_provenance:
     needs: build
     if: inputs.slsa && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
-    uses: stand-sure-org/Oui-DELIVER/.github/workflows/generate-provenance.yaml@feat/dotnet11-standalone
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/generate-provenance.yaml@main
     permissions:
       attestations: write
       id-token: write
