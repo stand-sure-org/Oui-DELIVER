@@ -35,7 +35,7 @@ concurrency:
 
 jobs:
   kaizen-sweep:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/kaizen-sweep.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/kaizen-sweep.yml@main
     with:
       repository: ${{ github.repository }}
       target_path: ${{ inputs.target_path }}

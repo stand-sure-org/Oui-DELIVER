@@ -70,7 +70,7 @@ permissions:
 
 jobs:
   version:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/semver.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/semver.yml@main
     permissions:
       contents: read
 
@@ -88,7 +88,7 @@ jobs:
     steps:
       - name: Detect build type
         id: detect
-        uses: innago-property-management/Oui-DELIVER/.github/actions/detect-build-type@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/detect-build-type@main
 
   build:
     runs-on: ubuntu-latest
@@ -111,7 +111,7 @@ jobs:
             echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
           fi
       - name: Build
-        uses: innago-property-management/Oui-DELIVER/.github/actions/build-node@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/build-node@main
         with:
           version: ${{ needs.version.outputs.version }}
           githubToken: "${{ secrets.GITHUB_TOKEN }}"
@@ -129,7 +129,7 @@ jobs:
           overwrite: 'true'
       - name: Publish Container Image
         if: inputs.imageName != ''
-        uses: innago-property-management/Oui-DELIVER/.github/actions/build-publish-sign-docker@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/build-publish-sign-docker@main
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -145,7 +145,7 @@ jobs:
           cosignPassword: ${{ secrets.cosignPassword }}
       - name: Update ArgoCD
         if: inputs.imageName != ''
-        uses: innago-property-management/Oui-DELIVER/.github/actions/update-argocd@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/update-argocd@main
         with:
           githubToken: ${{ secrets.githubToken }}
           repoName: ${{ inputs.argoCdRepoName }}

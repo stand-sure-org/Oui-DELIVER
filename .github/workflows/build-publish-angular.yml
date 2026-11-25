@@ -74,7 +74,7 @@ permissions:
 
 jobs:
   version:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/semver.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/semver.yml@main
     permissions:
       contents: read
 
@@ -92,7 +92,7 @@ jobs:
     steps:
       - name: Detect build type
         id: detect
-        uses: innago-property-management/Oui-DELIVER/.github/actions/detect-build-type@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/detect-build-type@main
 
   build:
     runs-on: Linux-x64__16-core__64GB-RAM
@@ -124,7 +124,7 @@ jobs:
           npm install --legacy-peer-deps
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Build
-        uses: innago-property-management/Oui-DELIVER/.github/actions/build-angular@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/build-angular@main
         with:
           npm_token: ${{ secrets.npm_token }}
           node_version: "${{ inputs.node_version }}"
@@ -150,7 +150,7 @@ jobs:
       #     overwrite: 'true'
       - name: Publish Container Image
         if: inputs.imageName != ''
-        uses: innago-property-management/Oui-DELIVER/.github/actions/build-publish-sign-docker@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/build-publish-sign-docker@main
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -166,7 +166,7 @@ jobs:
           cosignPassword: ${{ secrets.cosignPassword }}
       - name: Update ArgoCD
         if: inputs.imageName != ''
-        uses: innago-property-management/Oui-DELIVER/.github/actions/update-argocd@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/update-argocd@main
         with:
           githubToken: ${{ secrets.githubToken }}
           repoName: ${{ inputs.argoCdRepoName }}

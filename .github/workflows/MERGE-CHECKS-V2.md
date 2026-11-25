@@ -26,7 +26,7 @@ Replace workflow reference:
 ```yaml
 jobs:
   merge-checks:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/merge-checks-node-v2.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/merge-checks-node-v2.yml@main
     with:
       allowed_licenses_path: ".github/allowed-licenses.json"
       ignored_packages_path: ".github/ignored-packages.json"
@@ -45,7 +45,7 @@ Ignore intentional major version pins:
 ```yaml
 jobs:
   merge-checks:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/merge-checks-node-v2.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/merge-checks-node-v2.yml@main
     with:
       allowed_licenses_path: ".github/allowed-licenses.json"
       ignored_packages_path: ".github/ignored-packages.json"
@@ -85,7 +85,7 @@ Then reference it:
 ```yaml
 jobs:
   merge-checks:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/merge-checks-node-v2.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/merge-checks-node-v2.yml@main
     with:
       allowed_licenses_path: ".github/allowed-licenses.json"
       ignored_packages_path: ".github/ignored-packages.json"
@@ -194,7 +194,7 @@ Or use `outdated_target: "minor"` to ignore all major updates across all package
 
 If you encounter issues, revert to v1:
 ```yaml
-uses: innago-property-management/Oui-DELIVER/.github/workflows/merge-checks-node.yml@main
+uses: stand-sure-org/Oui-DELIVER/.github/workflows/merge-checks-node.yml@main
 ```
 
 Then file an issue with:

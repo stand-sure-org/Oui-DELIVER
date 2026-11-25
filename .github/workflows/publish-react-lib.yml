@@ -37,7 +37,7 @@ concurrency:
 
 jobs:
   version:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/semver.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/semver.yml@main
 
   publish:
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
 
       - name: Publish React Libraries
         id: publish
-        uses: innago-property-management/Oui-DELIVER/.github/actions/publish-react-lib@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/publish-react-lib@main
         with:
           node_version: ${{ inputs.node_version }}
           workspace_path: ${{ inputs.workspace_path }}

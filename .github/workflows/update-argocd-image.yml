@@ -50,7 +50,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Update ArgoCD
-        uses: innago-property-management/Oui-DELIVER/.github/actions/update-argocd@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/update-argocd@main
         with:
           githubToken: ${{ secrets.githubToken }}
           repoName: ${{ inputs.argoCdRepoName }}
