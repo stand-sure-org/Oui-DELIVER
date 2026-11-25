@@ -1,3 +1,3 @@
-.github/CODEOWNERS @jagdishprasad-tz @pawankumar-tz @ashutosh-tz @visheshsingh-tz
-.github @jagdishprasad-tz @pawankumar-tz @ashutosh-tz @visheshsingh-tz
-
+# Changes to workflows (which every stand-sure-org repo calls) need the owner's review.
+.github/CODEOWNERS @stand-sure
+.github @stand-sure
