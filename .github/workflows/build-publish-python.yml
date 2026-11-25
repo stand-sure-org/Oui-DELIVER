@@ -9,7 +9,7 @@ on:
         default: ''
       argoCdRepoName:
         required: false
-        description: "ArgoCD repo name. Omit if no image."
+        description: "ArgoCD repo (owner/name) to update with the new image tag. Omit to skip the ArgoCD update."
         type: string
         default: ''
       slsa:
@@ -27,7 +27,7 @@ on:
         default: ''
       argoCdRepoName:
         required: false
-        description: "ArgoCD repo name. Omit if no image."
+        description: "ArgoCD repo (owner/name) to update with the new image tag. Omit to skip the ArgoCD update."
         type: string
         default: ''      
       migrationsDockerfileContext:
@@ -123,7 +123,7 @@ jobs:
           migrationsDockerfileContext: ${{ inputs.migrationsDockerfileContext }}
           migrationsDockerfilePath: ${{ inputs.migrationsDockerfilePath }}
       - name: Update ArgoCD
-        if: inputs.imageName != ''
+        if: inputs.imageName != '' && inputs.argoCdRepoName != ''
         uses: stand-sure-org/Oui-DELIVER/.github/actions/update-argocd@main
         with:
           githubToken: ${{ secrets.githubToken }}

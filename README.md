@@ -146,6 +146,7 @@ Seamless ArgoCD integration:
 - Automatic values file updates
 - Pull request creation for review
 - Environment-specific configurations
+- Optional: the update only runs when `argoCdRepoName` is set, so repos without an ArgoCD repo just leave it out
 
 ## 💡 Usage Examples
 
