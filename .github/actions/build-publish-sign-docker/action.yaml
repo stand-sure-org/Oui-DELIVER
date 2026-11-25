@@ -38,6 +38,10 @@ inputs:
   cosignPassword:
     required: true
     description: "Password for Cosign key"
+  cosignPublicKey:
+    required: false
+    default: ""
+    description: "Public key (path or URL) to verify signatures with. Omit to derive it from cosignKey."
   buildArgs:
     required: false
     description: "Build arguments for Docker build (e.g., NUGET_SOURCE_URL=...)"
@@ -177,7 +181,11 @@ runs:
         cosign sign --key env://COSIGN_KEY "${IMAGE}@${VERIFIED_DIGEST}" --recursive=true --yes=true
 
         echo "Verifying signature..."
-        cosign verify --key "${COSIGN_PUBLIC_KEY_URL}" "${IMAGE}@${VERIFIED_DIGEST}" || {
+        if [ -z "$COSIGN_PUBLIC_KEY" ]; then
+          COSIGN_PUBLIC_KEY="${RUNNER_TEMP}/cosign.pub"
+          cosign public-key --key env://COSIGN_KEY > "$COSIGN_PUBLIC_KEY"
+        fi
+        cosign verify --key "${COSIGN_PUBLIC_KEY}" "${IMAGE}@${VERIFIED_DIGEST}" || {
           echo "::error::Signature verification failed!"
           exit 1
         }
@@ -188,7 +196,7 @@ runs:
         COSIGN_PASSWORD: ${{ inputs.cosignPassword }}
         IMAGE: "${{ inputs.registry }}/${{ inputs.organizationName }}/${{ inputs.imageName }}"
         VERIFIED_DIGEST: ${{ steps.verify-image.outputs.verified_digest }}
-        COSIGN_PUBLIC_KEY_URL: "https://raw.githubusercontent.com/innago-property-management/innago-cosign-public-key/refs/heads/main/cosign.pub"
+        COSIGN_PUBLIC_KEY: ${{ inputs.cosignPublicKey }}
       
     - name: sign migrations image
       if: ${{ inputs.migrationsDockerfilePath != '' }}
@@ -204,7 +212,11 @@ runs:
         cosign sign --key env://COSIGN_KEY "${IMAGE}@${DIGEST}" --recursive=true --yes=true
 
         echo "Verifying migrations signature..."
-        cosign verify --key "${COSIGN_PUBLIC_KEY_URL}" "${IMAGE}@${DIGEST}" || {
+        if [ -z "$COSIGN_PUBLIC_KEY" ]; then
+          COSIGN_PUBLIC_KEY="${RUNNER_TEMP}/cosign.pub"
+          cosign public-key --key env://COSIGN_KEY > "$COSIGN_PUBLIC_KEY"
+        fi
+        cosign verify --key "${COSIGN_PUBLIC_KEY}" "${IMAGE}@${DIGEST}" || {
           echo "::error::Migrations signature verification failed!"
           exit 1
         }
@@ -215,4 +227,4 @@ runs:
         COSIGN_PASSWORD: ${{ inputs.cosignPassword }}
         IMAGE: "${{ inputs.registry }}/${{ inputs.organizationName }}/${{ inputs.imageName }}-migrations"
         DIGEST: ${{ steps.publish-migrations.outputs.digest }}
-        COSIGN_PUBLIC_KEY_URL: "https://raw.githubusercontent.com/innago-property-management/innago-cosign-public-key/refs/heads/main/cosign.pub"
+        COSIGN_PUBLIC_KEY: ${{ inputs.cosignPublicKey }}
