@@ -1,6 +1,12 @@
 name: auto-pr
 on:
   workflow_call:
+    inputs:
+      draft:
+        description: "Open every PR as a draft (for example so a review bot waits for ready_for_review). A wip:/draft: commit prefix still forces a draft when false."
+        type: boolean
+        required: false
+        default: false
     secrets:
       token:
         description: "GitHub token with contents:read and pull-requests:write (fallback if app key not provided)"
@@ -43,6 +49,7 @@ jobs:
       - name: Create PR if none exists
         env:
           GH_TOKEN: ${{ steps.app_token.outputs.token || secrets.token }}
+          DRAFT_INPUT: ${{ inputs.draft }}
         run: |
           set -euo pipefail
 
@@ -53,10 +60,10 @@ jobs:
             exit 0
           fi
 
-          # Check head commit for wip:/draft: prefix (case-insensitive)
+          # Draft when the caller asks for it, or when the head commit has a wip:/draft: prefix (case-insensitive)
           draft_flag=""
           latest_commit=$(git log -1 --format=%s)
-          if echo "$latest_commit" | grep -iqE '^(wip|draft):'; then
+          if [ "${DRAFT_INPUT}" = "true" ] || echo "$latest_commit" | grep -iqE '^(wip|draft):'; then
             draft_flag="--draft"
           fi
 
