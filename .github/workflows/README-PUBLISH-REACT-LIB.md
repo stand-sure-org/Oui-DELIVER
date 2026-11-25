@@ -18,7 +18,7 @@ scripts works, React or otherwise.
 jobs:
   build-and-test:
     if: github.event_name == 'pull_request'
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/publish-react-lib.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/publish-react-lib.yml@main
     permissions:
       contents: read
       packages: read
@@ -30,7 +30,7 @@ jobs:
 
   build-and-publish:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/publish-react-lib.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/publish-react-lib.yml@main
     permissions:
       contents: read
       packages: write

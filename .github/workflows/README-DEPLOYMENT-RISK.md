@@ -39,7 +39,7 @@ on:
 jobs:
   assess-risk:
     name: Assess Deployment Risk
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/deployment-risk-assessment.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/deployment-risk-assessment.yml@main
     with:
       pr_number: ${{ github.event.pull_request.number }}
       base_branch: ${{ github.event.pull_request.base.ref }}
@@ -82,7 +82,7 @@ Customize the assessment with context specific to your repository:
 jobs:
   assess-risk:
     name: Assess Deployment Risk
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/deployment-risk-assessment.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/deployment-risk-assessment.yml@main
     with:
       pr_number: ${{ github.event.pull_request.number }}
       base_branch: ${{ github.event.pull_request.base.ref }}
@@ -293,8 +293,8 @@ For detailed architecture information, see [README-DEPLOYMENT-RISK-ARCHITECTURE.
 
 ### Getting Help
 
-- **Issues**: [Report bugs or request features](https://github.com/innago-property-management/Oui-DELIVER/issues)
-- **Discussions**: [Ask questions](https://github.com/innago-property-management/Oui-DELIVER/discussions)
+- **Issues**: [Report bugs or request features](https://github.com/stand-sure-org/Oui-DELIVER/issues)
+- **Discussions**: [Ask questions](https://github.com/stand-sure-org/Oui-DELIVER/discussions)
 - **Internal**: Reach out to the platform team on Slack
 
 ### Contributing

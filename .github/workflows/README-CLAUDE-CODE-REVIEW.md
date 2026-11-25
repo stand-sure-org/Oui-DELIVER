@@ -33,7 +33,7 @@ permissions:
 
 jobs:
   review:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/claude-code-review.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/claude-code-review.yml@main
     with:
       allow_approve: true
       additional_context: |
@@ -139,7 +139,7 @@ to your workflow permissions?
 
 Callers reference the reusable workflow via `@main`:
 ```yaml
-uses: innago-property-management/Oui-DELIVER/.github/workflows/claude-code-review.yml@main
+uses: stand-sure-org/Oui-DELIVER/.github/workflows/claude-code-review.yml@main
 ```
 
 **Be aware:** GitHub Actions detects when a reusable workflow has changed between the time a PR was opened and when the workflow runs. In some configurations, the Claude Code Action may refuse to run if the underlying workflow changed after the PR was created. This means:
@@ -190,7 +190,7 @@ additional_context: |
 jobs:
   review:
     if: github.event.pull_request.user.login != 'dependabot[bot]'
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/claude-code-review.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/claude-code-review.yml@main
     # ...
 ```
 

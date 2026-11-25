@@ -125,7 +125,7 @@ on:
 
 jobs:
   review:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/kaizen-code-review.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/kaizen-code-review.yml@main
     with:
       pr_number: ${{ github.event.pull_request.number }}
       repository: ${{ github.repository }}

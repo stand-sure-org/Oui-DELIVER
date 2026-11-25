@@ -65,7 +65,7 @@ jobs:
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     name: Respond to @claude Mention
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/claude-code-mention.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/claude-code-mention.yml@main
     with:
       repository: ${{ github.repository }}
       event_type: ${{ github.event_name }}
@@ -249,7 +249,7 @@ Customize Claude's behavior with additional context:
 jobs:
   claude-mention-response:
     if: contains(github.event.comment.body, '@claude')
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/claude-code-mention.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/claude-code-mention.yml@main
     with:
       repository: ${{ github.repository }}
       event_type: ${{ github.event_name }}
@@ -277,7 +277,7 @@ jobs:
     if: |
       contains(github.event.comment.body, '@claude') &&
       contains(github.event.issue.labels.*.name, 'help-wanted')
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/claude-code-mention.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/claude-code-mention.yml@main
     # ... rest of config
 ```
 
@@ -288,7 +288,7 @@ jobs:
     if: |
       contains(github.event.comment.body, '@claude') &&
       (github.event.sender.login == 'alice' || github.event.sender.login == 'bob')
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/claude-code-mention.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/claude-code-mention.yml@main
     # ... rest of config
 ```
 
@@ -466,6 +466,6 @@ If the format is consistently broken, open an issue in the Oui-DELIVER repositor
 
 ## Support
 
-- **Issues**: [Oui-DELIVER Issues](https://github.com/innago-property-management/Oui-DELIVER/issues)
+- **Issues**: [Oui-DELIVER Issues](https://github.com/stand-sure-org/Oui-DELIVER/issues)
 - **Questions**: Mention @claude in an issue or PR (dogfooding!)
 - **Platform Team**: Contact for MCP or infrastructure support

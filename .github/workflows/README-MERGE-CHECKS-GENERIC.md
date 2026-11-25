@@ -28,7 +28,7 @@ on:
 
 jobs:
   merge-checks:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/merge-checks-generic.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/merge-checks-generic.yml@main
 ```
 
 ### With ShellCheck for scripts/ directory
@@ -36,7 +36,7 @@ jobs:
 ```yaml
 jobs:
   merge-checks:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/merge-checks-generic.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/merge-checks-generic.yml@main
     with:
       shellcheck_scandir: "./scripts"
       shellcheck_severity: "warning"
@@ -47,7 +47,7 @@ jobs:
 ```yaml
 jobs:
   merge-checks:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/merge-checks-generic.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/merge-checks-generic.yml@main
     with:
       shellcheck_enabled: false
 ```

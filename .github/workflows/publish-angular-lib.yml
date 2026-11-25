@@ -35,7 +35,7 @@ concurrency:
 
 jobs:
   version:
-    uses: innago-property-management/Oui-DELIVER/.github/workflows/semver.yml@main
+    uses: stand-sure-org/Oui-DELIVER/.github/workflows/semver.yml@main
     # Inherit permissions from caller
     # permissions:
     #   contents: read
@@ -55,7 +55,7 @@ jobs:
           fetch-depth: 0
 
       - name: Publish Angular Libraries
-        uses: innago-property-management/Oui-DELIVER/.github/actions/publish-angular-lib@main
+        uses: stand-sure-org/Oui-DELIVER/.github/actions/publish-angular-lib@main
         with:
           node_version: ${{ inputs.node_version }}
           workspace_path: ${{ inputs.workspace_path }}
