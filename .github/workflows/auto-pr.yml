@@ -3,10 +3,10 @@ on:
   workflow_call:
     inputs:
       draft:
-        description: "Open every PR as a draft (for example so a review bot waits for ready_for_review). A wip:/draft: commit prefix still forces a draft when false."
+        description: "Open the PR as a draft (default), so review bots that skip drafts wait for ready_for_review after the description is filled in. Pass false to open it ready; a wip:/draft: commit prefix still forces a draft."
         type: boolean
         required: false
-        default: false
+        default: true
     secrets:
       token:
         description: "GitHub token with contents:read and pull-requests:write (fallback if app key not provided)"
