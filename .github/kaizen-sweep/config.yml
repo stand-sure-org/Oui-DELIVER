@@ -199,10 +199,6 @@ active_repos:
     language: smarty
     target_path: "charts/"
 
-  - name: argocd-shared
-    language: shell
-    target_path: "apps/"
-
   # CI/CD - sweep ourselves!
   - name: Oui-DELIVER
     language: shell
